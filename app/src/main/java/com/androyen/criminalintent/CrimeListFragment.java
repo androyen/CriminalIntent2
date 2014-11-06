@@ -50,6 +50,17 @@ public class CrimeListFragment extends ListFragment {
         startActivity(i);
     }
 
+    //Need to persist and update the ListView adapter when the ListView data set is changed
+    //Calling in onResume as the changes are made on the top Activity stack
+    @Override
+    public void onResume() {
+
+        super.onResume();
+        //Notify ListAdapter of any changes in the data set
+        ((CrimeAdapter)getListAdapter()).notifyDataSetChanged();
+
+    }
+
     //Create custom adapter as inner class
     private class CrimeAdapter extends ArrayAdapter<Crime> {
 
@@ -83,6 +94,8 @@ public class CrimeListFragment extends ListFragment {
 
 
         }
+
+
 
     }
 
