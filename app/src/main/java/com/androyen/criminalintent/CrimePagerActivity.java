@@ -83,6 +83,7 @@ public class CrimePagerActivity extends FragmentActivity {
                 //Set the currently selected crime page to update the ActionBar title
                 Crime crime = mCrimes.get(position);
                 if (crime.getTitle() != null) {
+                    //Set title of the Activity to the crime title
                     setTitle(crime.getTitle());
                 }
             }
