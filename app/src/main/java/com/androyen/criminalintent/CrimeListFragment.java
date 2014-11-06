@@ -1,5 +1,6 @@
 package com.androyen.criminalintent;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -42,7 +43,11 @@ public class CrimeListFragment extends ListFragment {
 
         //Get item from the List Adapter and cast it to Crime
         Crime c = ((CrimeAdapter)getListAdapter()).getItem(position);
-        Log.d(TAG, c.getTitle() + " was clicked.");
+
+        //Start CrimeActivity and send the Crime UUID
+        Intent i = new Intent(getActivity(), CrimeActivity.class);
+        i.putExtra(CrimeFragment.EXTRA_CRIME_ID, c.getId());
+        startActivity(i);
     }
 
     //Create custom adapter as inner class
