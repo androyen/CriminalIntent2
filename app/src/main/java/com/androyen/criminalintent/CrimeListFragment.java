@@ -4,8 +4,11 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -27,7 +30,8 @@ public class CrimeListFragment extends ListFragment {
         mCrimes = CrimeLab.get(getActivity()).getCrimes();
 
         //Using ArrayAdapter for this ListView
-        ArrayAdapter<Crime> adapter = new ArrayAdapter<Crime>(getActivity(), android.R.layout.simple_list_item_1, mCrimes);
+//        ArrayAdapter<Crime> adapter = new ArrayAdapter<Crime>(getActivity(), android.R.layout.simple_list_item_1, mCrimes);
+        CrimeAdapter adapter = new CrimeAdapter(mCrimes);
         setListAdapter(adapter);
     }
 
@@ -37,8 +41,44 @@ public class CrimeListFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
 
         //Get item from the List Adapter and cast it to Crime
-        Crime c = (Crime)(getListAdapter()).getItem(position);
+        Crime c = ((CrimeAdapter)getListAdapter()).getItem(position);
         Log.d(TAG, c.getTitle() + " was clicked.");
+    }
+
+    //Create custom adapter as inner class
+    private class CrimeAdapter extends ArrayAdapter<Crime> {
+
+        public CrimeAdapter(ArrayList<Crime> crimes) {
+
+            //Not using predefined layout. 0 as param
+            super(getActivity(), 0, crimes);
+        }
+
+        //Override getView to display custom list items in ListView
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            //If there is no view, inflate one
+            if (convertView == null) {
+                convertView = getActivity().getLayoutInflater().inflate(R.layout.list_item_crime, null);
+            }
+
+            //Configure view and get the currently, selected crime
+            Crime c = getItem(position);
+
+            TextView titleTextView = (TextView)convertView.findViewById(R.id.crime_list_item_titleTextView);
+            //Set the Crime's title
+            titleTextView.setText(c.getTitle());
+            TextView dateTextView = (TextView)convertView.findViewById(R.id.crime_list_item_dateTextView);
+            dateTextView.setText(c.getDate().toString());
+            CheckBox solvedCheckBox = (CheckBox)convertView.findViewById(R.id.crime_list_item_solvedCheckBox);
+            solvedCheckBox.setChecked(c.isSolved());
+
+            return convertView;
+
+
+        }
+
     }
 
 }
