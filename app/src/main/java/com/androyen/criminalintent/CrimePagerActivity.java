@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * Created by rnguyen on 11/6/14.
@@ -49,6 +50,46 @@ public class CrimePagerActivity extends FragmentActivity {
             public int getCount() {
 
                 return mCrimes.size();
+            }
+        });
+        mViewPager.setOffscreenPageLimit(3);
+
+        //Have ViewPager show the current selected crime in ListView when returned
+
+        //Get crime Id
+        UUID crimeId = (UUID)getIntent().getSerializableExtra(CrimeFragment.EXTRA_CRIME_ID);
+
+        //Loop through mCrimes and find the crime with the matching crimeId
+        for (int i = 0; i < mCrimes.size(); i++) {
+
+            //If the crime matches the stashed crimeId
+            if (mCrimes.get(i).getId().equals(crimeId)) {
+                //Set ViewPager to leave off at the current index
+                mViewPager.setCurrentItem(i);
+                break;
+            }
+        }
+
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+                //Set the currently selected crime page to update the ActionBar title
+                Crime crime = mCrimes.get(position);
+                if (crime.getTitle() != null) {
+                    setTitle(crime.getTitle());
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
             }
         });
     }
