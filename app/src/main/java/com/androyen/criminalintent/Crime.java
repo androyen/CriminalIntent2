@@ -22,7 +22,7 @@ public class Crime {
     }
 
     //Getter and setter
-    public UUID getID() {
+    public UUID getId() {
         return mId;
     }
 
