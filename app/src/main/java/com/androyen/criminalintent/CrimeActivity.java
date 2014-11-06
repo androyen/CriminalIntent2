@@ -6,6 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import java.util.UUID;
+
 
 public class CrimeActivity extends SingleFragmentActivity {
 
@@ -29,7 +31,14 @@ public class CrimeActivity extends SingleFragmentActivity {
 
     @Override
     protected Fragment createFragment() {
-        return new CrimeFragment();
+
+        //Activity will use the static method to create the fragment besides the constructor
+
+        //Getting the UUID extra from CrimeFramgnet
+        UUID crimeId = (UUID) getIntent().getSerializableExtra(CrimeFragment.EXTRA_CRIME_ID);
+
+        //Will create and stash the Crime inside CrimeFragment's bundle
+        return  CrimeFragment.newInstance(crimeId);
     }
 
     @Override

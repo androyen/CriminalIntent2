@@ -30,11 +30,30 @@ public class CrimeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Get the Crime ID from CrimeListFragment.  Using getSerializableExtra because UUID is a serializable object
-        UUID crimeId = (UUID) getActivity().getIntent().getSerializableExtra(EXTRA_CRIME_ID);
+        //DIRECT ACCESS FOR FRAGMENT TO ACCESS INTENT EXTRA
+//        //Get the Crime ID from CrimeListFragment.  Using getSerializableExtra because UUID is a serializable object
+//        UUID crimeId = (UUID) getActivity().getIntent().getSerializableExtra(EXTRA_CRIME_ID);
+
+        //RETRIEVING THE EXTRA DATA FROM THE LOCAL FRAGMENT ARGUMENT STASH
+        UUID crimeId = (UUID) getArguments().getSerializable(EXTRA_CRIME_ID);
 
         //Get static method from CrimeLab the Crime from the UUID
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
+    }
+
+    //Create newInstance() static method. Used by Fragment to store data on a Bundle stash of the crime
+    //Hosting activity will call this static method besides default constructor.
+    //Bundle stash must be attached after fragment creation but before attached to hosting activity
+    public static CrimeFragment newInstance(UUID crimeId) {
+
+        Bundle args = new Bundle();
+        //Putting serializable since we are stashing the crime UUID
+        args.putSerializable(EXTRA_CRIME_ID, crimeId);
+
+        CrimeFragment fragment = new CrimeFragment();
+        fragment.setArguments(args);
+
+        return fragment;
     }
 
     @Override
