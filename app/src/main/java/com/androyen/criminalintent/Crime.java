@@ -11,6 +11,21 @@ public class Crime {
     private String mTitle;
 
     public Crime() {
-        
+
+        //Generate unique identifier for crime
+        mId = UUID.randomUUID();
+    }
+
+    //Getter and setter
+    public UUID getID() {
+        return mId;
+    }
+
+    public String getTitle() {
+        return mTitle;
+    }
+
+    public void setTitle(String title) {
+        mTitle = title;
     }
 }
