@@ -49,4 +49,10 @@ public class Crime {
     public void setSolved(boolean solved) {
         mSolved = solved;
     }
+
+    //Need to Override toString() to customize view of ListView
+    @Override
+    public String toString() {
+        return mTitle; //Displaying crime title in ListView
+    }
 }
