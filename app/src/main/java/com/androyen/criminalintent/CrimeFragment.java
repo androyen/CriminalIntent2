@@ -99,7 +99,8 @@ public class CrimeFragment extends Fragment {
                 //Get and create DatePickerFragment
                 FragmentManager fm = getActivity().getSupportFragmentManager();
 
-                DatePickerFragment dialog = new DatePickerFragment();
+                //Getting the date stashed in DatePickerFragment
+                DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
                 //Add dialog to FragmentManager to put on the screen
                 dialog.show(fm, DIALOG_DATE);
 
