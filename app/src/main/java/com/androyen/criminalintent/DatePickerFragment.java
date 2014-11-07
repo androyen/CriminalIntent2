@@ -1,9 +1,13 @@
 package com.androyen.criminalintent;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 
@@ -15,6 +19,8 @@ import java.util.GregorianCalendar;
  * Created by rnguyen on 11/6/14.
  */
 public class DatePickerFragment extends DialogFragment {
+
+    private static final String TAG = DatePickerFragment.class.getSimpleName();
 
     public static final String EXTRA_DATE = "com.androyen.criminalintent.date";
     private Date mDate;
@@ -47,6 +53,7 @@ public class DatePickerFragment extends DialogFragment {
                 //Translate year, month, day into a Date object using a calendar
                 mDate = new GregorianCalendar(year, monthOfYear, dayOfMonth).getTime();
 
+
                 //Update argument to preserve new date from screen rotation
                 getArguments().putSerializable(EXTRA_DATE, mDate);
             }
@@ -56,7 +63,15 @@ public class DatePickerFragment extends DialogFragment {
         return new AlertDialog.Builder(getActivity())
                 .setView(v)
                 .setTitle(R.string.date_picker_title)
-                .setPositiveButton(android.R.string.ok, null) //null value means no listener on the Ok button
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        //When the dialog OK button is pressed, this will send the date back to target fragment CrimeFragment
+                        sendResult(Activity.RESULT_OK);
+                    }
+                })
                 .create();
     }
 
@@ -70,6 +85,20 @@ public class DatePickerFragment extends DialogFragment {
         fragment.setArguments(args);
 
         return fragment;
+    }
+
+    //Send intent extra of date to target fragment CrimeFragment
+    private void sendResult(int resultCode) {
+        //If there is no target fragment, exit
+        if (getTargetFragment() == null) {
+            return;
+        }
+
+        Intent i = new Intent();
+        i.putExtra(EXTRA_DATE, mDate);
+
+        //Call CrimeFragment.onActivityResult() method to send intent extra
+        getTargetFragment().onActivityResult(getTargetRequestCode(), resultCode, i);
     }
 
 }

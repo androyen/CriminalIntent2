@@ -1,10 +1,13 @@
 package com.androyen.criminalintent;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +16,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -20,10 +24,15 @@ import java.util.UUID;
  */
 public class CrimeFragment extends Fragment {
 
+    private static final String TAG = CrimeFragment.class.getSimpleName();
+
     public static final String EXTRA_CRIME_ID = "com.androyen.criminalintent.crime_id";
 
     //TAG for DatePickerFragment
     private static final String DIALOG_DATE = "date";
+
+    //Constant for setTargetFragment request code
+    private static final int REQUEST_DATE = 0;
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -89,7 +98,10 @@ public class CrimeFragment extends Fragment {
         });
 
         mDateButton = (Button)v.findViewById(R.id.crime_date);
-        mDateButton.setText(mCrime.getDate().toString());
+//        mDateButton.setText(mCrime.getDate().toString());
+        //REFACTOR CODE
+        updateDate();
+
 //        mDateButton.setEnabled(false);  //Disables the click on the button
 
         //Implement the DatePickerFragment dialog
@@ -101,6 +113,10 @@ public class CrimeFragment extends Fragment {
 
                 //Getting the date stashed in DatePickerFragment
                 DatePickerFragment dialog = DatePickerFragment.newInstance(mCrime.getDate());
+
+                //Set target Fragment CrimeFragment to send date
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+
                 //Add dialog to FragmentManager to put on the screen
                 dialog.show(fm, DIALOG_DATE);
 
@@ -121,4 +137,32 @@ public class CrimeFragment extends Fragment {
 
         return v;
     }
+
+    //Overriding onActivityResult to get date from Intent extra
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        //Check the result code passed in
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+
+        if (requestCode == REQUEST_DATE) {
+            //Get the date from the Intent extra sent
+            Date date = (Date)data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+
+            //Set date on the crime
+            mCrime.setDate(date);
+
+            //Refresh Date button text to new date
+            updateDate();
+        }
+    }
+
+    //Refactor code to update Date button
+    private void updateDate() {
+        mDateButton.setText(mCrime.getDate().toString());
+
+    }
+
 }
