@@ -1,14 +1,18 @@
 package com.androyen.criminalintent;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -43,6 +47,8 @@ public class CrimeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setHasOptionsMenu(true); //Allows fragment to call Options Menu methods
+
         //DIRECT ACCESS FOR FRAGMENT TO ACCESS INTENT EXTRA
 //        //Get the Crime ID from CrimeListFragment.  Using getSerializableExtra because UUID is a serializable object
 //        UUID crimeId = (UUID) getActivity().getIntent().getSerializableExtra(EXTRA_CRIME_ID);
@@ -69,11 +75,21 @@ public class CrimeFragment extends Fragment {
         return fragment;
     }
 
+    @TargetApi(11)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
 
         //Create the view    False to not attact it to parent view
         View v = inflater.inflate(R.layout.fragment_crime, parent, false);
+
+
+        //Enable the Action Bar app icon as an UP icon. Set conditions to display this on API 11
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            //Check if there is a parent activity in the manifest
+            if (NavUtils.getParentActivityName(getActivity()) != null) {
+                getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+            }
+        }
 
         mTitleField = (EditText)v.findViewById(R.id.crime_title);
         mTitleField.setText(mCrime.getTitle());
@@ -136,6 +152,23 @@ public class CrimeFragment extends Fragment {
         });
 
         return v;
+    }
+
+    //Implement UP icon in action bar
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case android.R.id.home:
+                //Check if there is a Parent Activity Meta Tag
+                if (NavUtils.getParentActivityName(getActivity()) != null) {
+                    NavUtils.navigateUpFromSameTask(getActivity()); //Navigate to parent activity
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     //Overriding onActivityResult to get date from Intent extra

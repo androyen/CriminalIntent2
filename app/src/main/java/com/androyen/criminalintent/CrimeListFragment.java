@@ -1,9 +1,11 @@
 package com.androyen.criminalintent;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,11 +26,18 @@ public class CrimeListFragment extends ListFragment {
     private static final String TAG = CrimeListFragment.class.getSimpleName();
     private ArrayList<Crime> mCrimes;
 
+    //Save subtitle state during rotation
+    private boolean mSubtitleVisible;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true); //Tells Fragment do receive Options Menu callback from Activity
+
+        //Retain fragment during rotation
+        setRetainInstance(true);
+        mSubtitleVisible = false;
 
         //Set title of the activity
         getActivity().setTitle(R.string.crimes_title);
@@ -40,6 +49,22 @@ public class CrimeListFragment extends ListFragment {
 //        ArrayAdapter<Crime> adapter = new ArrayAdapter<Crime>(getActivity(), android.R.layout.simple_list_item_1, mCrimes);
         CrimeAdapter adapter = new CrimeAdapter(mCrimes);
         setListAdapter(adapter);
+    }
+
+    //Override onCreateView
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, parent, savedInstanceState);
+
+
+        //Set subtitle if flag is true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            if (mSubtitleVisible) {
+                getActivity().getActionBar().setSubtitle(R.string.subtitle);
+            }
+        }
+
+        return v;
     }
 
 
@@ -72,6 +97,12 @@ public class CrimeListFragment extends ListFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.fragment_crime_list, menu);
+
+        //If there is a subtitle set,  hide title
+        MenuItem showSubtitle = menu.findItem(R.id.menu_item_show_subtitle);
+        if (mSubtitleVisible && showSubtitle != null) {
+            showSubtitle.setTitle(R.string.hide_subtitle);
+        }
     }
 
     @Override
@@ -87,6 +118,28 @@ public class CrimeListFragment extends ListFragment {
                 Intent i = new Intent(getActivity(), CrimePagerActivity.class);
                 i.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.getId()); //To send as intent, need object to implement Serializable
                 startActivityForResult(i, 0);
+                return true;
+
+            case R.id.menu_item_show_subtitle:
+
+                //Check if there is a subtitle in the Action Bar
+                if (getActivity().getActionBar().getSubtitle() == null) {
+                    getActivity().getActionBar().setSubtitle(R.string.subtitle);
+                    //Set title
+                    item.setTitle(R.string.hide_subtitle);
+
+                    //Set the subtitle state during rotation
+                    mSubtitleVisible = true;
+                }
+                else {
+                    //If there is a  title. Do not set
+                    getActivity().getActionBar().setSubtitle(null);
+                    //Set title
+                    item.setTitle(R.string.show_subtitle);
+
+                    mSubtitleVisible = false;
+                }
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
