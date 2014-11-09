@@ -6,6 +6,7 @@ import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -73,6 +74,25 @@ public class CrimeListFragment extends ListFragment {
         inflater.inflate(R.menu.fragment_crime_list, menu);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.menu_item_new_crime:
+                //Create new crime and add it to mCrimes. Open it with CrimePagerActivity
+                Crime crime = new Crime();
+                mCrimes.add(crime);
+                //Send as extra to CrimeFragment
+                Intent i = new Intent(getActivity(), CrimePagerActivity.class);
+                i.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.getId()); //To send as intent, need object to implement Serializable
+                startActivityForResult(i, 0);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
     //Create custom adapter as inner class
     private class CrimeAdapter extends ArrayAdapter<Crime> {
 
@@ -81,6 +101,8 @@ public class CrimeListFragment extends ListFragment {
             //Not using predefined layout. 0 as param
             super(getActivity(), 0, crimes);
         }
+
+
 
         //Override getView to display custom list items in ListView
         @Override
