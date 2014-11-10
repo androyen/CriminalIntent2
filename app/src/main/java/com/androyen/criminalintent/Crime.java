@@ -30,6 +30,17 @@ public class Crime {
         mDate = new Date();
     }
 
+    //Constructor to accept JSONObject. Used to load crimes from disk
+    public Crime(JSONObject json) throws JSONException {
+        mId = UUID.fromString(json.getString(JSON_ID));
+        if (json.has(JSON_TITLE)) {
+            mTitle = json.getString(JSON_TITLE);
+        }
+
+        mSolved = json.getBoolean(JSON_SOLVED);
+        mDate = new Date(json.getString(JSON_DATE));
+    }
+
     //Convert crime to JSON format
     public JSONObject toJSON() throws JSONException {
 

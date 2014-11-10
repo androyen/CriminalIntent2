@@ -27,7 +27,7 @@ public class CrimeLab {
 
     private CrimeLab(Context appContext) {
         mContext = appContext;
-        mCrimes = new ArrayList<Crime>();
+//        mCrimes = new ArrayList<Crime>();
 //        //Load 100 crimes
 //        for (int i = 0; i < 100; i++) {
 //            Crime c = new Crime();
@@ -39,6 +39,16 @@ public class CrimeLab {
         //Grab the context of CrimeLab and save the list of crimes to disk crimes.json
         mSerializer = new CriminalIntentJSONSerializer(mContext, FILENAME);
 
+
+        //Call to load the list of crimes from disk to the ArrayList when first accessed
+        try {
+            mCrimes = mSerializer.loadCrimes();
+        }
+        catch (Exception e) {
+            //If there is no existing Crime ArrayList, create a new empty one
+            mCrimes = new ArrayList<Crime>();
+            Log.e(TAG, "Error loading crimes: ",  e);
+        }
     }
 
     //Getter for this singleton
