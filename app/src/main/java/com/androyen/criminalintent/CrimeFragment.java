@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +23,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import java.util.Date;
 import java.util.UUID;
@@ -34,6 +36,9 @@ public class CrimeFragment extends Fragment {
     private static final String TAG = CrimeFragment.class.getSimpleName();
 
     public static final String EXTRA_CRIME_ID = "com.androyen.criminalintent.crime_id";
+
+    //Show picture in ImageView
+    private static final String DIALOG_IMAGE = "image";
 
     //TAG for DatePickerFragment
     private static final String DIALOG_DATE = "date";
@@ -48,6 +53,7 @@ public class CrimeFragment extends Fragment {
     private Button mDateButton;
     private CheckBox mSolvedCheckBox;
     private ImageButton mPhotoButton;
+    private ImageView mPhotoView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -169,7 +175,7 @@ public class CrimeFragment extends Fragment {
             }
         });
 
-        //If camera is not available, diable camera functionalith
+        //If camera is not available, disable camera functionality
         PackageManager pm = getActivity().getPackageManager();
         boolean hasACamera = pm.hasSystemFeature(PackageManager.FEATURE_CAMERA) ||
                 pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT) ||
@@ -177,6 +183,23 @@ public class CrimeFragment extends Fragment {
         if (!hasACamera) {
             mPhotoButton.setEnabled(false);
         }
+
+        mPhotoView = (ImageView)v.findViewById(R.id.crime_ImageView);
+        mPhotoView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Photo p = mCrime.getPhoto();
+                if (p == null) {
+                    return;
+                }
+
+                FragmentManager fm = getActivity().getSupportFragmentManager();
+                String path = getActivity().getFileStreamPath(p.getFilename()).getAbsolutePath();
+                ImageFragment.newInstance(path).show(fm, DIALOG_IMAGE);
+
+            }
+        });
 
 
 
@@ -224,7 +247,11 @@ public class CrimeFragment extends Fragment {
             String filename = data.getStringExtra(CrimeCameraFragment.EXTRA_PHOTO_FILENAME);
 
             if (filename != null) {
-                Log.i(TAG, "filename: " + filename);
+
+                //Create new Photo and set it to the current crime
+                Photo p = new Photo(filename);
+                mCrime.setPhoto(p);
+                showPhoto();
             }
         }
     }
@@ -242,6 +269,33 @@ public class CrimeFragment extends Fragment {
 
         //From singleton, get all the crimes and save it to disk
         CrimeLab.get(getActivity()).saveCrimes();
+    }
+
+    //Set scaled photo in ImageView
+    private void showPhoto() {
+        //(Re)Set the image buttons' image based on our photo
+        Photo p = mCrime.getPhoto();
+        BitmapDrawable b = null;
+        if (p != null) {
+            String path = getActivity().getFileStreamPath(p.getFilename()).getAbsolutePath();
+            b = PictureUtils.getScaledDrawable(getActivity(), path);
+        }
+
+        mPhotoView.setImageDrawable(b);
+    }
+
+    //Load photo in onStart() to become visible
+    @Override
+    public void onStart() {
+        super.onStart();
+        showPhoto();
+    }
+
+    //Free up memory of the Bitmap images
+    @Override
+    public void onStop() {
+        super.onStop();
+        PictureUtils.cleanImageView(mPhotoView);
     }
 
 }
