@@ -40,6 +40,8 @@ public class CrimeFragment extends Fragment {
 
     //Constant for setTargetFragment request code
     private static final int REQUEST_DATE = 0;
+    //Constant to request photo from CrimeCameraFragment
+    private static final int REQUEST_PHOTO = 1;
 
     private Crime mCrime;
     private EditText mTitleField;
@@ -163,7 +165,7 @@ public class CrimeFragment extends Fragment {
             public void onClick(View v) {
                 //Start CrimeCameraFragment to open camera
                 Intent i = new Intent(getActivity(), CrimeCameraActivity.class);
-                startActivity(i);
+                startActivityForResult(i, REQUEST_PHOTO);
             }
         });
 
@@ -175,6 +177,8 @@ public class CrimeFragment extends Fragment {
         if (!hasACamera) {
             mPhotoButton.setEnabled(false);
         }
+
+
 
         return v;
     }
