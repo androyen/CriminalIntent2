@@ -94,4 +94,9 @@ public class CrimeLab {
         mCrimes.add(c);
     }
 
+    //Delete crime from contextual menu
+    public void deleteCrime(Crime c) {
+        mCrimes.remove(c);
+    }
+
 }
