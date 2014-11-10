@@ -198,4 +198,13 @@ public class CrimeFragment extends Fragment {
 
     }
 
+    //Saving the crimes data during onPause()
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        //From singleton, get all the crimes and save it to disk
+        CrimeLab.get(getActivity()).saveCrimes();
+    }
+
 }

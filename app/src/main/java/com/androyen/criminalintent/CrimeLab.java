@@ -1,7 +1,11 @@
 package com.androyen.criminalintent;
 
 import android.content.Context;
+import android.util.Log;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -9,6 +13,11 @@ import java.util.UUID;
  * Created by rnguyen on 11/5/14.
  */
 public class CrimeLab {
+
+    //Serializing the Crimes to save
+    private static final String TAG = CrimeLab.class.getSimpleName();
+    private static final String FILENAME = "crimes.json";
+    private CriminalIntentJSONSerializer mSerializer;
 
     //Create Singleton of stash of crimes
     private static CrimeLab sCrimeLab;
@@ -26,6 +35,9 @@ public class CrimeLab {
 //            c.setSolved(i % 2 == 0);
 //            mCrimes.add(c);
 //        }
+
+        //Grab the context of CrimeLab and save the list of crimes to disk crimes.json
+        mSerializer = new CriminalIntentJSONSerializer(mContext, FILENAME);
 
     }
 
@@ -52,6 +64,19 @@ public class CrimeLab {
         }
 
         return null;
+    }
+
+    //Return true/false if able to serialize and save crimes
+    public boolean saveCrimes() {
+        try {
+            mSerializer.saveCrimes(mCrimes);
+            Log.d(TAG, "crimes saved to file");
+            return true;
+        }
+        catch (Exception e) {
+            Log.e(TAG, "Error saving crimes: ", e);
+            return false;
+        }
     }
 
     //Add crime from the Action Bar
