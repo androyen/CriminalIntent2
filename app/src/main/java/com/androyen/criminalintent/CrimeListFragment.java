@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -68,7 +70,65 @@ public class CrimeListFragment extends ListFragment {
 
         //Flag to register contextual menu. Registering it with default Android listView
         ListView listView = (ListView)v.findViewById(android.R.id.list);
-        registerForContextMenu(listView);
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+            //Use the floating context menus for Froyo and Gingerbread devices
+            registerForContextMenu(listView);
+        }
+        else {
+            //Use contextual action bar.   Enables multiples items to be deleted
+            listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
+            //Callbacks for the contextual menu
+            listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+
+                @Override
+                public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+
+                }
+
+                @Override
+                public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                    MenuInflater inflater = mode.getMenuInflater();
+                    inflater.inflate(R.menu.crime_list_item_context, menu);
+                    return true;
+                }
+
+                @Override
+                public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                    return false;
+                }
+
+                @Override
+                public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+                    switch (item.getItemId()) {
+
+                        case R.id.menu_item_delete_crime:
+                            CrimeAdapter adapter = (CrimeAdapter)getListAdapter(); //Get adapter
+                            CrimeLab crimeLab = CrimeLab.get(getActivity()); //Get list of crimes
+                            for (int i = adapter.getCount() - 1; i >= 0; i--) {
+                                if (getListView().isItemChecked(i)) {
+                                    crimeLab.deleteCrime(adapter.getItem(i));
+                                }
+                            }
+                            mode.finish(); //prepares action mode to be destroyed
+                            adapter.notifyDataSetChanged();
+                            return true;
+
+                        default:
+                            return false;
+
+                    }
+
+                }
+
+                @Override
+                public void onDestroyActionMode(ActionMode mode) {
+
+                }
+            });
+        }
 
         return v;
     }
