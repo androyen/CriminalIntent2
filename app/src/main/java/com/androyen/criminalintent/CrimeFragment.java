@@ -219,6 +219,14 @@ public class CrimeFragment extends Fragment {
             //Refresh Date button text to new date
             updateDate();
         }
+        else if (requestCode == REQUEST_PHOTO) {
+            //Create a new Photo object and attact it to the crime
+            String filename = data.getStringExtra(CrimeCameraFragment.EXTRA_PHOTO_FILENAME);
+
+            if (filename != null) {
+                Log.i(TAG, "filename: " + filename);
+            }
+        }
     }
 
     //Refactor code to update Date button

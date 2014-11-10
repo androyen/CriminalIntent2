@@ -27,7 +27,7 @@ import java.util.UUID;
  */
 public class CrimeCameraFragment extends Fragment {
 
-    private static final String EXTRA_PHOTO_FILENAME = "com.androyen.criminalintent.photo_filename";
+    public static final String EXTRA_PHOTO_FILENAME = "com.androyen.criminalintent.photo_filename";
 
     private static final String TAG = CrimeCameraFragment.class.getSimpleName();
     private SurfaceView mSurfaceView;
