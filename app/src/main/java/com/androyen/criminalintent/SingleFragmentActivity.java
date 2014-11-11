@@ -13,10 +13,14 @@ public abstract class SingleFragmentActivity extends FragmentActivity {
     //Abstract method to get the current fragment
     protected abstract Fragment createFragment();
 
+    protected int getLayoutResId() {
+        return R.layout.activity_fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fragment);
+        setContentView(getLayoutResId());
 
         //Add Fragment to Activity
         FragmentManager fm = getSupportFragmentManager();
