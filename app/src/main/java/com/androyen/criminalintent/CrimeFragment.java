@@ -61,6 +61,23 @@ public class CrimeFragment extends Fragment {
     private ImageButton mPhotoButton;
     private ImageView mPhotoView;
     private Button mSuspectButton;
+    private Callbacks mCallbacks;
+
+    public interface Callbacks {
+        void onCrimeUpdated(Crime crime);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mCallbacks = (Callbacks)activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -124,6 +141,8 @@ public class CrimeFragment extends Fragment {
 
                 //Set the crime title from EditText
                 mCrime.setTitle(s.toString());
+                mCallbacks.onCrimeUpdated(mCrime);
+                getActivity().setTitle(mCrime.getTitle());
             }
 
             @Override
@@ -166,6 +185,7 @@ public class CrimeFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 //Set the crime's solved property
                 mCrime.setSolved(isChecked);
+                mCallbacks.onCrimeUpdated(mCrime);
 
             }
         });
@@ -274,6 +294,7 @@ public class CrimeFragment extends Fragment {
 
             //Set date on the crime
             mCrime.setDate(date);
+            mCallbacks.onCrimeUpdated(mCrime);
 
             //Refresh Date button text to new date
             updateDate();
@@ -287,6 +308,7 @@ public class CrimeFragment extends Fragment {
                 //Create new Photo and set it to the current crime
                 Photo p = new Photo(filename);
                 mCrime.setPhoto(p);
+                mCallbacks.onCrimeUpdated(mCrime);
                 showPhoto();
             }
         }
@@ -311,6 +333,7 @@ public class CrimeFragment extends Fragment {
             c.moveToFirst();
             String suspect = c.getString(0);
             mCrime.setSuspect(suspect);
+            mCallbacks.onCrimeUpdated(mCrime);
             mSuspectButton.setText(suspect);
             c.close();
         }

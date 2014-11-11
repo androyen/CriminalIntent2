@@ -1,5 +1,6 @@
 package com.androyen.criminalintent;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +33,26 @@ public class CrimeListFragment extends ListFragment {
 
     //Save subtitle state during rotation
     private boolean mSubtitleVisible;
+
+    private Callbacks mCallbacks;
+
+    //Implement Callback interfrace for hosting activities
+    public interface Callbacks {
+        void onCrimeSelected(Crime crime);
+
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mCallbacks = (Callbacks)activity;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallbacks = null;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -141,10 +162,11 @@ public class CrimeListFragment extends ListFragment {
         //Get item from the List Adapter and cast it to Crime
         Crime c = ((CrimeAdapter)getListAdapter()).getItem(position);
 
-        //Start CrimePagerActivity and send the Crime UUID
-        Intent i = new Intent(getActivity(), CrimePagerActivity.class);
-        i.putExtra(CrimeFragment.EXTRA_CRIME_ID, c.getId());
-        startActivity(i);
+//        //Start CrimePagerActivity and send the Crime UUID
+//        Intent i = new Intent(getActivity(), CrimePagerActivity.class);
+//        i.putExtra(CrimeFragment.EXTRA_CRIME_ID, c.getId());
+//        startActivity(i);
+        mCallbacks.onCrimeSelected(c);
     }
 
     //Need to persist and update the ListView adapter when the ListView data set is changed
@@ -180,10 +202,11 @@ public class CrimeListFragment extends ListFragment {
                 //Create new crime and add it to mCrimes. Open it with CrimePagerActivity
                 Crime crime = new Crime();
                 mCrimes.add(crime);
-                //Send as extra to CrimeFragment
-                Intent i = new Intent(getActivity(), CrimePagerActivity.class);
-                i.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.getId()); //To send as intent, need object to implement Serializable
-                startActivityForResult(i, 0);
+//                //Send as extra to CrimeFragment
+//                Intent i = new Intent(getActivity(), CrimePagerActivity.class);
+//                i.putExtra(CrimeFragment.EXTRA_CRIME_ID, crime.getId()); //To send as intent, need object to implement Serializable
+//                startActivityForResult(i, 0);
+                mCallbacks.onCrimeSelected(crime);
                 return true;
 
             case R.id.menu_item_show_subtitle:
@@ -238,6 +261,10 @@ public class CrimeListFragment extends ListFragment {
                 return true;
         }
         return super.onContextItemSelected(item);
+    }
+
+    public void updateUI() {
+        ((CrimeAdapter)getListAdapter()).notifyDataSetChanged();
     }
 
     //Create custom adapter as inner class
